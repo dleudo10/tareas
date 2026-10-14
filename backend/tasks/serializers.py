@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from .permissions import is_task_admin 
 from .models import Category, Task
 
 
@@ -45,21 +45,18 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
 
     def validate_category(self, category):
-        request = self.context["request"]
-        roles = request.auth.get("roles", [])
+        claims = self.context["request"].auth
 
+        if is_task_admin(claims):
+            return category
+
+        roles = claims.get("roles", [])
         if isinstance(roles, str):
             roles = [roles]
 
-        # Solo permitimos categorías vinculadas a los roles
-        # que OLIMPO haya devuelto en la introspección.
-        permitted = category.role_assignments.filter(
-            role_code__in=roles,
-        ).exists()
-
+        permitted = category.role_assignments.filter(role_code__in=roles).exists()
         if not permitted:
             raise serializers.ValidationError(
                 "No tienes permiso para utilizar esta categoría."
             )
-
         return category
