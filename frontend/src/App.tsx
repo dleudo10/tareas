@@ -89,6 +89,8 @@ export default function App() {
             setTasks(taskData);
             setCategories(categoryData);
         } catch (err) {
+            console.log("load data:")
+            console.log(err.response)
             setError(getErrorMessage(err));
         } finally {
             setLoading(false);
@@ -140,6 +142,8 @@ export default function App() {
             resetForm();
             await loadData();
         } catch (err) {
+            console.log("handle submit:")
+            console.log(err.response)
             setError(getErrorMessage(err));
         } finally {
             setSaving(false);
@@ -161,6 +165,8 @@ export default function App() {
             await deleteTask(token, task.id);
             await loadData();
         } catch (err) {
+            console.log("handle Delete:")
+            console.log(err.response)
             setError(getErrorMessage(err));
         }
     }
